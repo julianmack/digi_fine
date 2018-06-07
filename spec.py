@@ -26,3 +26,5 @@ Wikipedia page.
 Exercise 3 – Below is an output from a model predicting a continuous outcome (house price). Please
 take a look and bring your thoughts to the Case Study meeting for discussion.
 """
+
+"changing this file"
