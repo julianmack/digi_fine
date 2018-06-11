@@ -19,7 +19,7 @@ from random import choices
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-#global - range of x values
+#global var - range of x values
 RANGE_x = 20
 
 def main():
@@ -50,7 +50,7 @@ def main():
     data = choices(xs, weights, k=100)
 
     #plot histogram
-    plot_hist(data)
+    plot_hist(data, xs)
 
 
 def check_input_args():
@@ -75,13 +75,16 @@ def check_input_args():
 
     return n
 
-def plot_hist(data):
+def plot_hist(data, xs):
     sns.set()  # use seaborn package for design
-    _ = plt.hist(data, bins=100)
+    _ = plt.hist(data)
+
+    min_x = min(xs)
+    max_x = max(xs)
 
     plt.ylabel("Frequency")
 
-    plt.xticks(range(0, RANGE_x + 1))
+    plt.xticks(range(min_x, max_x + 1))
 
     plt.show()
     return None
