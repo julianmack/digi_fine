@@ -7,13 +7,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+#generate 10 random ints, x
 
-np.random.seed(32)
-data = np.random.randn(3,100)
+#assign each number with probability to give distribution P(X=x)
 
+#use P(X=x) to generate 100 values of X
 
-sns.set()  # sets look of hist to nicely designed seaborn package
-_ = plt.hist(data, bins=10)
-#always label axes
-
-plt.show()
+#plot histogram
