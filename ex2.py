@@ -56,7 +56,7 @@ def access_infobox(soup, phrase, next_row_req=False):
 
     Note: I used chrome developer mode to determine
     that required info was in a <table> with
-    class="infobox..." There is probably a more
+    class= "infobox..." There is probably a more
     elegant way to work this out.
     """
 
