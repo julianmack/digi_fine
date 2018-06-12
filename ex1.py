@@ -1,19 +1,21 @@
-"""SPEC: Create a list of random integers (5-10 integers). Assign each number with a probability.
-Then randomly generate 100 numbers from the list given the probability distribution you just
-generated. Finally, plot a histogram to show the results (i.e. number of times each number from the
+"""SPEC: Create a list of random integers (5-10 integers).
+Assign each number with a probability. Then randomly
+generate 100 numbers from the list given the probability
+distribution you just generated. Finally, plot a histogram
+to show the results (i.e. number of times each number from the
 list is generated).
 
 Assumptions
-Use probability distribution of form P(X=x)=k*x^2, where k is a constant
+Use probability distribution of form P(X=x)=k*x^2,
+where k is a constant
 require x (possible values) in range 0 < x < 21
 require n (number of values) in range 5 <= n <= 10
 
 USAGE: python3 ex1.py n
 where n is an int in 5<=n<=10
-
 """
-import sys
 
+import sys
 import numpy as np
 from random import choices
 import matplotlib.pyplot as plt
@@ -59,7 +61,6 @@ def check_input_args():
         print("USAGE: python3 ex1.py n,\n")
         sys.exit(1)
 
-    #get n
     try:
         n = int(sys.argv[1])
     except:
@@ -81,13 +82,10 @@ def plot_hist(data, xs):
 
     min_x = min(xs)
     max_x = max(xs)
-
     plt.ylabel("Frequency")
-
     plt.xticks(range(min_x, max_x + 1))
-
     plt.show()
-    return None
+
 
 if __name__ == "__main__":
     main()

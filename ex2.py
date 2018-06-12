@@ -128,6 +128,5 @@ def access_history(soup):
     return history_txt
 
 
-
 if __name__ == "__main__":
     main()
