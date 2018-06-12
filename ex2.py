@@ -1,24 +1,21 @@
-"""SPEC: Please extract and derive the following information from the Wikipedia page about
-Python (https://en.wikipedia.org/wiki/Python_(programming_language)) and output the following
+"""SPEC:
+Extract and derive the following information from the
+Python Wikipedia page and output the following
 items:
-a) The name of “designed by” person for the Python programming language according to the
-Wikipedia page.
+a) The name of “designed by” person for the Python
+programming language according to the Wikipedia page.
 b) Number of unique words in the ‘History’ session.
-c) (Optional) Number of languages influenced by Python according to the Wikipedia page."""
+c) (Optional) Number of languages influenced by
+Python according to the Wikipedia page."""
+
 import sys
 import requests
-import re
-import json
 from bs4 import BeautifulSoup
-from lxml import html
 import nltk
 import string
 
 #global
 ADDRESS = "https://en.wikipedia.org/wiki/Python_(programming_language)"
-
-ADDRESS1 = "https://en.wikipedia.org/wiki/Laurie_Cahill"
-
 
 def main():
     #request webpage
@@ -31,36 +28,60 @@ def main():
     soup = BeautifulSoup(data, 'html.parser')
 
     #part_a
-    designer = part_a(soup)
+    [designer] = access_infobox(soup, "Designed")
 
-    #part b - refactor common part a parts
-    history_txt = []
-    hist = []
-    for body_elem in soup.body.find_all(id="History"):
-        hist.append(body_elem)
+    #part b
+    history_txt = access_history(soup)
+    unique_words = unique_tokens(history_txt)
+    num_unique_words = len(unique_words)
 
-    #check length
-    if len(hist) == 1:
-        pass
-    else:
-        print("refine search")
+    #part_c
+    [influenced_by, influenced] = access_infobox(soup, "Influenced", True)
+    #determine number of unique tokens
+    num_influenced = len(unique_tokens([influenced]))
+
+    #output results:
+    print("\nRESULTS\n")
+    print("Designed by:                    {}".format(designer))
+    print("Number unique words in history: {}".format(num_unique_words))
+    print("Number languages influenced:    {}\n".format(num_influenced))
+
+def access_infobox(soup, phrase, next_row_req=False):
+    """
+    Returns detail from wiki infobox
+    when given title keyphrase and bs4 object
+    USAGE: access_infobox(bs4obj, keyphrase, flag)
+    where flag is when title and description
+    are on seperate rows
+
+    Note: I used chrome developer mode to determine
+    that required info was in a <table> with
+    class="infobox..." There is probably a more
+    elegant way to work this out.
+    """
+
+    table = soup.find("table", class_="infobox")
+
+    descriptions = []
+    for row in table.find_all("tr"):
+        if row.text:
+            if phrase in row.text:
+                if next_row_req == True:
+                    row = row.find_next_sibling()
+                description = row.td.text
+                descriptions.append(description)
+
+    #check at least one value returned:
+    num_des = len(descriptions)
+    if num_des is 0:
+        print("Search terms not found. Try again")
         sys.exit(1)
 
-    #move up a level and skip "edit" <span>
-    current_elem = hist[0].parent.find_next_sibling()
+    return descriptions
 
-    #iterate through elements until next headline
-    while current_elem.find(class_="mw-headline") == None:
-        history_txt.append(current_elem.text)
-        current_elem = current_elem.find_next_sibling()
-        #print(current_elem)
-
-    unique_words = tokenize(history_txt)
-    num_words = len(unique_words)
-    print (unique_words)
-
-
-def tokenize(xs):
+def unique_tokens(xs):
+    """USAGE: pass list of strings,
+    returns tokenized list of unique strings"""
     output = set()
     for x in xs:
         x = parse(x)
@@ -70,59 +91,42 @@ def tokenize(xs):
     return output
 
 def parse(text):
+    """Removes punctuation and digits"""
     text = text.translate(text.maketrans("", "", string.punctuation))
     text = text.translate(text.maketrans("", "", string.digits))
     return text
 
-def part_a(soup):
+def access_history(soup):
+    """Returns list of text from history section.
+    History title stored with id="History"
+    Wiki sections are not nested in a <div>.
+    Therefore - must scroll through tags
+    until reaching another heading
+    where class="mw-headline"
     """
-    a) find "designed by":
-    This info is in a <table> at top of the page
-    using developer mode (chrome) - in class "infobox vevent"
-    """
+    elements = []
+    for body_elem in soup.body.find_all(id="History"):
+        elements.append(body_elem)
 
-    table = soup.find("table", class_="infobox")
-
-    #find table headings
-    designers = []
-    for heading in table.find_all("th"):
-        if heading.string:
-            if "Designed" in heading.string:
-                designer = heading.find_next_sibling().string
-                designers.append(designer)
-
-    #check there was only one value returned:
-    num_des = len(designers)
-    if num_des is 0:
-        print("Search terms not found. Try again")
+    #check length
+    if len(elements) == 0:
+        print("No elements returned. Widen search")
         sys.exit(1)
-    elif num_des > 1:
-        print("Multiple designers found. Refine search")
+    elif len(elements) > 1:
+        print("Too many elements returned. Refine search")
         sys.exit(1)
 
-    return designer
+    #move up a level and skip "edit" <span>
+    current_elem = elements[0].parent.find_next_sibling()
 
+    #iterate through elements until next heading
+    history_txt = []
+    while current_elem.find(class_="mw-headline") == None:
+        history_txt.append(current_elem.text)
+        current_elem = current_elem.find_next_sibling()
 
+    return history_txt
 
-"""
-def find_all_tags():
-    tags = set()
-    for tag in soup.find_all():
-        tags.add(tag.name
-    return tags
-"""
-"""
-    headers = r.headers
-    for key, value in headers.items():
-        print (key, value)
-    #data = json.loads(r.text)
-    #data = r.json()
-
-    jsonD = json.dumps(data)
-    jsonL = json.loads(jsonD)
-    print(type(jsonL))
-
-"""
 
 
 if __name__ == "__main__":
